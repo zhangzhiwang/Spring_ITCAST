@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- spring全局配置文件，命名自定义，一般命名成：applicationContext.xml -->
+<!-- bean容器 -->  <!-- xmlns:p="http://www.springframework.org/schema/p" -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+     	http://www.springframework.org/schema/tx/spring-tx.xsd
+        ">
+	<!-- 一个bean就是一个对象（类实例） -->
+	<!-- <bean id="user1" class="com.asiainfo.entity.User" scope="prototype" -->
+	<!-- lazy-init="false" init-method="initUser" destroy-method="destroyUser"></bean> 
+		相当于：User user1 = new User(); bean id相当于变量名 -->
+	<!-- <bean id="order1" class="com.asiainfo.entity.Order" scope="singleton" 
+		lazy-init="false" init-method="initOrder" destroy-method="destroyOrder"></bean> --> <!-- 延迟初始化默认为false，且只对单例有效，因为在初始化bean容器之前，spring不知道要创建多少个原型（多例）对象，所以只能在需要的时候创建，因此是不是懒初始化对于prototype来说意义不大 -->
+	<!-- destroy-method在bean容器被销毁的时候执行 -->
+
+	<!-- 实例化bean的3种方式 -->
+	<!-- 1、通过无参构造方法实例化bean -->
+	<!-- <bean id="user2" class="com.asiainfo.entity.User"></bean> -->
+
+	<!-- 2、通过有参构造方法实例化bean -->
+	<!-- <bean id="user3" class="com.asiainfo.entity.User"> -->
+	<!-- <constructor-arg index="1" value="张三" type="java.lang.String"></constructor-arg> -->  <!-- constructor-arg设置构造方法的参数，index为参数的顺序（表名构造方法的第几个参数），value为该参数的值，ref为该值的引用，type为参数的类型，可以为基本数据类型和复合类型（复合类型一定要写类型的全名，不要和mybatis的类型别名混淆，spring没有类型的别名），type属性可省略，name为构造函数的形参名称（貌似spring4才有name属性） -->
+	<!-- <constructor-arg index="0" value="1" type="int"></constructor-arg> -->
+	<!-- <constructor-arg index="2" ref="order1"></constructor-arg> -->
+	<!-- <constructor-arg ref="order1" name="orderZzw123"></constructor-arg> -->
+	<!-- </bean> -->
+
+	<!-- 3、通过工厂创建bean -->
+	<!-- 3.1 通过工厂的非静态方法构造bean -->
+	<!-- <bean id="createBeanFactory" class="com.asiainfo.entity.factory.CreateBeanFactory"></bean> -->
+	<!-- <bean id="user4" factory-bean="createBeanFactory" factory-method="getInstance" 
+		scope="prototype"></bean> -->
+	<!-- 3.2 通过工厂的静态方法构造bean -->
+	<!-- <bean id="user5" class="com.asiainfo.entity.factory.CreateBeanFactory" 
+		factory-method="getStaticInstance"></bean> -->
+
+	<!-- 给类属性注入值的方法 -->
+	<!-- 1、通过构造器来注入 -->
+	<!-- <bean id="user6" class="com.asiainfo.entity.User" scope="prototype"> 
+		<constructor-arg index="0" value="100" type="int"></constructor-arg> <constructor-arg 
+		index="1" value=""></constructor-arg> </bean> -->
+	<!-- <bean id="uA" class="com.asiainfo.action.UserAction" scope="prototype"> -->
+	<!-- <constructor-arg ref="userServiceZzw"></constructor-arg> -->
+	<!-- </bean> -->
+
+	<!-- 2、通过setter方法注入 -->
+	<!-- <bean id="user7" class="com.asiainfo.entity.User"> -->
+	<!-- <property name="idZzw" value="101"></property> --> <!-- name的值是和setter方法名去掉前面的“set”剩下的名称首字母小写一致，但通常来说剩下的名称首字母小写和属性名一致，所以，name属性的值间接地和类属性名一致 -->
+	<!-- </bean> -->
+	<!-- <bean id="userServiceZzw" class="com.asiainfo.service.impl.UserServiceImpl"> 
+		class要配实现类，原因：1、接口不能实例化 2、接口会有多个实现类，如果想改变接口的实现类，不用动java代码，只改配置文件即可 -->
+	<!-- <property name="userDao" ref="userDaoZzw123"></property> -->
+	<!-- </bean> -->
+	<!-- <bean id="userDaoZzw123" class="com.asiainfo.dao.impl.UserDaoImpl"></bean> -->
+
+	<!-- 内部bean -->
+	<!-- <bean id="uA_zzw" class="com.asiainfo.action.UserAction" scope="prototype"> -->
+	<!-- <property name="userService"> -->
+	<!-- <bean class="com.asiainfo.service.impl.UserServiceImpl"> --> <!-- 该bean只能在id为uA_zzw的bean内部使用，其它bean无法引用该bean -->
+	<!-- <property name="userDao"> -->
+	<!-- <bean class="com.asiainfo.dao.impl.UserDaoImpl"></bean> -->
+	<!-- </property> -->
+	<!-- </bean> -->
+	<!-- </property> -->
+	<!-- </bean> -->
+
+	<!-- 3、通过p命名空间注入 -->
+	<!-- <bean id="user8" class="com.asiainfo.entity.User" p:id="103" p:name="zhangsan" 
+		p:order-ref="order1" scope="prototype"></bean> --> <!-- p命名空间实际上也是调用的setter方法 -->
+
+	<!-- 4、自动装配 -->
+	<!-- <bean id="userAction" class="com.asiainfo.action.UserAction" scope="prototype"></bean> -->     <!-- autowire="byType"，ioc容器里面只能配置一个该类型的bean，否则报错 -->
+	<!-- <bean id="userService" class="com.asiainfo.service.impl.UserServiceImpl" 
+		scope="prototype"></bean> -->
+	<!-- <bean id="userDao" class="com.asiainfo.dao.impl.UserDaoImpl" scope="prototype"></bean> -->
+
+	<!-- 5、注解 -->
+	<!-- 使用注解，step1：引入xmlns:context配置 step2：开启扫描 step3：使用注解 -->
+	<context:component-scan base-package="com.asiainfo"></context:component-scan>
+
+	<!-- <bean id="userDaoImpl123" class="com.asiainfo.dao.impl.UserDaoImpl"></bean> 
+		注解可以和xml配置同时使用 -->
+
+	<!-- <bean id="aop" class="com.asiainfo.aop.Aop"> -->
+	<!-- <constructor-arg index="0" ref="userDaoImpl"></constructor-arg> -->
+	<!-- </bean> -->
+
+	<!-- <bean id="channelDaoProxy" class="com.asiainfo.proxy.practice.Aop" 
+		factory-method="getProxyInstance"> -->
+	<!-- <constructor-arg name="obj" ref="channelDaoImpl"></constructor-arg> -->
+	<!-- <constructor-arg name="aspectParam" ref="aspectTest"></constructor-arg> -->
+	<!-- </bean> -->
+
+	<!-- 开启aop -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+	<!-- xml方式实现aop -->
+	<!-- xml配置 -->
+	<!-- <aop:config> -->
+	<!-- 定义切点 -->
+	<!-- <aop:pointcut expression="execution(* com.asiainfo.dao.impl.*.*(..))" 
+		id="pc"/> -->
+	<!-- 切面 -->
+	<!-- <aop:aspect id="aspectId" ref="springAspectXml"> -->
+	<!-- <aop:before method="startTransaction" pointcut="execution(* com.asiainfo.dao.impl.*.*(..))"/> -->
+	<!-- <aop:after method="commitTransaction" pointcut-ref="pc"/> -->
+	<!-- <aop:after-returning method="afterReturning" pointcut-ref="pc"/> -->
+	<!-- <aop:after-throwing method="afterThrowing" pointcut-ref="pc"/> -->
+	<!-- <aop:around method="around" pointcut-ref="pc"/> -->
+	<!-- </aop:aspect> -->
+	<!-- </aop:config> -->
+
+	<!-- <bean id="springAspectXml" class="com.asiainfo.aop.SpringAspectXml"></bean> -->
+
+	<!-- spring对jdbc的支持 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/mybatis"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value=""></property>
+		<property name="initialPoolSize" value="3"></property>
+		<property name="maxPoolSize" value="10"></property>
+		<property name="maxStatements" value="100"></property>
+		<property name="acquireIncrement" value="2"></property>
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg index="0" ref="dataSource"></constructor-arg>
+	</bean>
+
+	<bean id="springJdbc" class="com.asiainfo.jdbc.SpringJdbc">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+
+	<bean id="itemsDaoImplId" class="com.asiainfo.dao.impl.ItemsDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+
+	<!-- spring的声明式事务 -->
+	<!-- 配置的方式配置声明式事务一共三步：1、配置事务实现类（相当于切面） 2、配置事务增强 3、配置aop。相当于在哪里（第3步）用什么事务（第1步），怎么用事务（第2步） -->
+	<!-- 1、配置事务实现类 -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- 2、配置事务增强 -->
+<!-- 	<tx:advice id="txAdvice" transaction-manager="txManager"> -->
+<!-- 		<tx:attributes> -->
+<!-- 			<tx:method name="*save*" read-only="false"/> -->
+<!-- 			<tx:method name="get*" read-only="true"/> -->
+<!-- 			<tx:method name="*" read-only="false"/> -->
+<!-- 		</tx:attributes> -->
+<!-- 	</tx:advice> -->
+	
+	<!-- 3、配置aop -->
+<!-- 	<aop:config> -->
+<!-- 		<aop:pointcut expression="execution(* com.asiainfo.service.impl.*.*(..))" id="pc"/> -->
+<!-- 		<aop:advisor advice-ref="txAdvice" pointcut-ref="pc"/> -->
+<!-- 	</aop:config> -->
+	
+	<!-- 注解的方式配置声明式事务也有三步：1、开启注解扫描 2、指定注解的方式实现事务 3、需要用到事务的地方加上注解 -->
+	<!-- 1、开启注解扫描（上面已实现） -->
+	
+	<!-- 2、指定以注解的方式实现事务 -->
+	<tx:annotation-driven transaction-manager="txManager"/>
+	
+	<!-- 3、需要用到事务的地方加上注解，可以在方法上，可以在本类上，可以在父类上 -->
+
+	<bean id="e2" class="com.asiainfo.transaction.E"></bean>
+</beans>
